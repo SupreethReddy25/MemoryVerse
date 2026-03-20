@@ -1,0 +1,124 @@
+﻿node.exe : PASS src/__tests__/cache.test.ts
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" 
+"C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ( 
+   PASS src/__tests__/cache.test.ts:String)   
+  [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandEr 
+   ror
+ 
+  Cache Service
+    √ should produce the same hash for the 
+same vector (7 ms)
+    √ should produce the same hash for 
+vectors differing only at 2nd decimal
+    √ should produce different hashes for 
+very different vectors (1 ms)
+    √ getCachedResponse should return null on 
+cache miss (4 ms)
+    √ should return cached value after 
+setCachedResponse (2 ms)
+    √ should NOT return tenant A cache for 
+tenant B with same vector (2 ms)
+
+  console.error
+    Redis connection failed: Error: Connection is closed.
+        at EventEmitter.connectionCloseHandler (C:\Supreeth\Projects\MemoryVerse\backend-node\node_modules\ioredis\built\Redis.js:208:28)
+        at Object.onceWrapper (node:events:623:26)
+        at EventEmitter.emit (node:events:508:28)
+        at processTicksAndRejections (node:internal/process/task_queues:84:11)
+
+    [0m [90m 13 |[39m     })[33m;[39m
+     [90m 14 |[39m     redisClient[33m.[39mconnect()[33m.[39m[36mcatch[39m((err) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 15 |[39m       console[33m.[39merror([32m'Redis connection failed:'[39m[33m,[39m err)[33m;[39m
+     [90m    |[39m               [31m[1m^[22m[39m
+     [90m 16 |[39m     })[33m;[39m
+     [90m 17 |[39m   }
+     [90m 18 |[39m   [36mreturn[39m redisClient[33m;[39m[0m
+
+      at src/services/cache.service.ts:15:15
+
+PASS src/__tests__/documents.test.ts (10.909 
+s)
+  Documents Router
+    √ should return 401 without 
+authentication (66 ms)
+    √ should return 400 for unsupported file 
+type (606 ms)
+    √ should return only documents belonging 
+to the authenticated tenant (952 ms)
+    √ should delete own document and return 
+204 (533 ms)
+    √ should return 403 when trying to delete 
+another tenant's document (855 ms)
+
+  console.error
+    Redis cache write failed
+
+    [0m [90m 61 |[39m   } [36mcatch[39m {
+     [90m 62 |[39m     [90m// Swallow — cache writes must never break the response[39m
+    [31m[1m>[22m[39m[90m 63 |[39m     console[33m.[39merror([32m'Redis cache write failed'[39m)[33m;[39m
+     [90m    |[39m             [31m[1m^[22m[39m
+     [90m 64 |[39m   }
+     [90m 65 |[39m }
+     [90m 66 |[39m[0m
+
+      at setCachedResponse (src/services/cache.service.ts:63:13)
+
+PASS src/__tests__/query.test.ts (11.254 s)
+  Query Router - POST /query/suggest
+    √ should return 401 without 
+authentication (88 ms)
+    √ should return 400 for empty text (594 
+ms)
+    √ should return 400 for text exceeding 
+500 characters (444 ms)
+    √ should return 200 with 
+text/event-stream Content-Type (887 ms)
+    √ should send JWT tenantId to Python 
+service, not body value (1402 ms)
+
+PASS src/__tests__/auth.test.ts (12.254 s)
+  Auth Endpoints
+    POST /auth/register
+      √ should register a new user and return 
+tokens with tenantId (201) (669 ms)
+      √ should reject duplicate email 
+registration (409) (457 ms)
+      √ should reject weak password (< 8 
+chars) (400) (7 ms)
+    POST /auth/login
+      √ should login with correct credentials 
+and return tokens (200) (932 ms)
+      √ should reject login with wrong 
+password (401) (767 ms)
+    POST /auth/refresh
+      √ should rotate tokens on valid refresh 
+(200) (622 ms)
+    Protected Routes
+      √ should reject access to protected 
+route without token (401) (5 ms)
+      √ should populate req.tenantId from JWT 
+on protected route (200) (445 ms)
+      √ should use JWT tenantId, NOT body 
+tenantId — security boundary test (429 ms)
+
+A worker process has failed to exit 
+gracefully and has been force exited. This is 
+likely caused by tests leaking due to 
+improper teardown. Try running with 
+--detectOpenHandles to find leaks. Active 
+timers can also cause this, ensure that 
+.unref() was called on them.
+Test Suites: 4 passed, 4 total
+Tests:       25 passed, 25 total
+Snapshots:   0 total
+Time:        13.591 s
+Ran all test suites.
+Force exiting Jest: Have you considered using 
+`--detectOpenHandles` to detect async 
+operations that kept running after all tests 
+finished?

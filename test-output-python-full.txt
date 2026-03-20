@@ -1,0 +1,85 @@
+============================= test session starts =============================
+platform win32 -- Python 3.10.11, pytest-8.2.0, pluggy-1.6.0 -- C:\Supreeth\Projects\MemoryVerse\backend-python\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Supreeth\Projects\MemoryVerse\backend-python
+plugins: anyio-4.12.1, asyncio-0.23.6
+asyncio: mode=strict
+collecting ... collected 41 items
+
+tests/test_chunker.py::test_short_text_returns_empty PASSED              [  2%]
+tests/test_chunker.py::test_exact_chunk_size_returns_one_chunk PASSED    [  4%]
+tests/test_chunker.py::test_chunk_size_plus_one_returns_two_chunks PASSED [  7%]
+tests/test_chunker.py::test_overlap_correct PASSED                       [  9%]
+tests/test_chunker.py::test_no_chunk_below_min_size PASSED               [ 12%]
+tests/test_chunker.py::test_empty_string_returns_empty PASSED            [ 14%]
+tests/test_chunker.py::test_long_text_chunk_count PASSED                 [ 17%]
+tests/test_chunker.py::test_chunks_are_valid_utf8 PASSED                 [ 19%]
+tests/test_ingest_endpoint.py::test_ingest_whatsapp_valid PASSED         [ 21%]
+tests/test_ingest_endpoint.py::test_ingest_pdf_valid PASSED              [ 24%]
+tests/test_ingest_endpoint.py::test_ingest_empty_content PASSED          [ 26%]
+tests/test_ingest_endpoint.py::test_ingest_invalid_file_type PASSED      [ 29%]
+tests/test_ingest_endpoint.py::test_embed_text PASSED                    [ 31%]
+tests/test_ingest_endpoint.py::test_delete_namespace PASSED              [ 34%]
+tests/test_ingest_endpoint.py::test_namespace_isolation PASSED           [ 36%]
+tests/test_pinecone_client.py::test_query_namespace_returns_correct_shape PASSED [ 39%]
+tests/test_pinecone_client.py::test_query_namespace_filters_low_scores PASSED [ 41%]
+tests/test_pinecone_client.py::test_query_namespace_uses_correct_namespace PASSED [ 43%]
+tests/test_rag_pipeline.py::test_rag_stream_with_context PASSED          [ 46%]
+tests/test_rag_pipeline.py::test_rag_stream_no_matches PASSED            [ 48%]
+tests/test_rag_pipeline.py::test_rag_stream_gemini_error FAILED          [ 51%]
+tests/test_rag_pipeline.py::test_sse_format PASSED                       [ 53%]
+tests/test_rag_pipeline.py::test_context_isolation PASSED                [ 56%]
+tests/test_whatsapp_parser.py::test_standard_timestamp_format PASSED     [ 58%]
+tests/test_whatsapp_parser.py::test_us_timestamp_format PASSED           [ 60%]
+tests/test_whatsapp_parser.py::test_full_timestamp_format PASSED         [ 63%]
+tests/test_whatsapp_parser.py::test_multiline_message_joined PASSED      [ 65%]
+tests/test_whatsapp_parser.py::test_media_omission_removed PASSED        [ 68%]
+tests/test_whatsapp_parser.py::test_system_message_encrypted_removed PASSED [ 70%]
+tests/test_whatsapp_parser.py::test_system_message_left_removed PASSED   [ 73%]
+tests/test_whatsapp_parser.py::test_emoji_preserved PASSED               [ 75%]
+tests/test_whatsapp_parser.py::test_empty_input PASSED                   [ 78%]
+tests/test_whatsapp_parser.py::test_only_system_messages PASSED          [ 80%]
+tests/test_whatsapp_parser.py::test_urls_preserved PASSED                [ 82%]
+tests/test_whatsapp_parser.py::test_group_chat_sender_prefixes_stripped PASSED [ 85%]
+tests/test_whatsapp_parser.py::test_colon_in_message_text PASSED         [ 87%]
+tests/test_whatsapp_parser.py::test_unicode_characters_preserved PASSED  [ 90%]
+tests/test_whatsapp_parser.py::test_three_character_boundary PASSED      [ 92%]
+tests/test_whatsapp_parser.py::test_short_messages_grouped PASSED        [ 95%]
+tests/test_whatsapp_parser.py::test_bracketless_timestamp_format PASSED  [ 97%]
+tests/test_whatsapp_parser.py::test_real_world_export_sample PASSED      [100%]
+
+================================== FAILURES ===================================
+________________________ test_rag_stream_gemini_error _________________________
+
+    @pytest.mark.asyncio
+    async def test_rag_stream_gemini_error():
+        with patch("src.rag.pipeline.query_namespace", return_value=_make_mock_matches()):
+            with patch("src.rag.pipeline.genai") as mock_genai:
+                mock_model = MagicMock()
+                mock_model.generate_content.side_effect = Exception("API quota exceeded")
+                mock_genai.GenerativeModel.return_value = mock_model
+    
+                from src.rag.pipeline import rag_stream
+                events = await _collect_stream(rag_stream("tenant-C", "test query", [0.1] * 384))
+    
+        # Should yield error event, NOT raise
+        assert len(events) >= 1
+        error_data = json.loads(events[-1].replace("data: ", "").strip())
+>       assert error_data["error"] == "LLM unavailable"
+E       AssertionError: assert 'API quota exceeded' == 'LLM unavailable'
+E         
+E         - LLM unavailable
+E         + API quota exceeded
+
+tests\test_rag_pipeline.py:99: AssertionError
+---------------------------- Captured stdout call -----------------------------
+GEMINI ERROR: API quota exceeded
+============================== warnings summary ===============================
+tests/test_rag_pipeline.py::test_rag_stream_with_context
+  C:\Supreeth\Projects\MemoryVerse\backend-python\venv\lib\site-packages\google\api_core\_python_version_support.py:275: FutureWarning: You are using a Python version (3.10.11) which Google will stop supporting in new releases of google.api_core once it reaches its end of life (2026-10-04). Please upgrade to the latest Python version, or at least Python 3.11, to continue receiving updates for google.api_core past that date.
+    warnings.warn(message, FutureWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_rag_pipeline.py::test_rag_stream_gemini_error - AssertionEr...
+============= 1 failed, 40 passed, 1 warning in 77.69s (0:01:17) ==============
